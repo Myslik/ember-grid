@@ -36,6 +36,9 @@ GRID.PaginatedMixin = Ember.Mixin.create({
     }).property('page', 'limit'),
 
     paginatedContent: Ember.computed(function () {
+        if (this.get('page') >= this.get('pages')) {
+            this.set('page', 0);
+        }
         return this.get('paginableContent').slice(this.get('offset'), this.get('offset') + this.get('limit'));
     }).property('@each', 'page', 'limit', 'paginableContent'),
 
@@ -197,7 +200,11 @@ GRID.BodyView = Ember.CollectionView.extend({
     tagName: 'tbody',
     contentBinding: 'controller.rows',
     classNames: ['table-body'],
-    itemViewClass: 'GRID.RowView'
+    itemViewClass: 'GRID.RowView',
+    emptyView: Ember.View.extend({
+        tagName: 'tr',
+        template: Ember.Handlebars.compile('<td {{bindAttr colspan="controller.columns.length"}} class="muted">Nothing to display.</td>')
+    })
 });
 
 GRID.RowView = Ember.ContainerView.extend({
@@ -306,7 +313,7 @@ GRID.PageListView = Ember.ContainerView.extend({
         var pagesFrom = Math.max(0, page - this.visiblePages);
         var pagesTo = Math.min(pages, page + this.visiblePages + 1);
         var limit = this.get('controller.limit');
-
+        
         var pages = [];
         for (var i = pagesFrom; i < pagesTo; i++) {
             pages.push({
