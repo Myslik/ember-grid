@@ -30,9 +30,36 @@
 
       </header>
       <section>
-        <h1>ember-grid</h1>
+        <h1>Ember Grid</h1>
 
 <p>Grid component for Ember.js</p>
+
+<h2>Dependencies</h2>
+
+<ul>
+<li>jQuery</li>
+<li>Twitter Bootstrap</li>
+<li>Handlebars</li>
+<li>Ember.js</li>
+</ul><h2>Usage</h2>
+
+<div class="highlight"><pre><span class="nx">App</span><span class="p">.</span><span class="nx">PersonsController</span> <span class="o">=</span> <span class="nx">GRID</span><span class="p">.</span><span class="nx">TableController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+
+    <span class="nx">columns</span><span class="o">:</span> <span class="p">[</span>
+        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
+        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+    <span class="p">]</span>
+
+<span class="p">});</span>
+</pre></div>
+
+<h2>Features</h2>
+
+<ul>
+<li>Sortable</li>
+<li>Pagination</li>
+<li>Formatters</li>
+</ul>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
