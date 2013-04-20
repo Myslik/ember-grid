@@ -3,6 +3,8 @@ Ember Grid
 
 Grid component for Ember.js
 
+Check it out this [demo](http://myslik.github.io/ember-grid/examples/basic/index.html).
+
 ## Dependencies
 
 * jQuery
