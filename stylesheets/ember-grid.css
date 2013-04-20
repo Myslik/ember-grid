@@ -1,0 +1,56 @@
+﻿.ember-grid {
+  border: 1px solid #dddddd;
+  margin-bottom: 10px;
+}
+.table-toolbar {
+  border-bottom: 1px solid #dddddd;
+  background-color: #e6f1f6;
+  padding: 5px;
+}
+.table-header {
+  background-color: #f9f9f9;
+}
+.table-header-cell {
+  cursor: pointer;
+}
+.sort-desc span {
+  float: right;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin: 8px 5px 0 0;
+  border-top: 4px solid #000000;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  content: "";
+}
+.sort-asc span {
+  float: right;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin: 8px 5px 0 0;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-bottom: 4px solid #000000;
+  content: "";
+}
+.table-footer {
+  border-top: 1px solid #dddddd;
+  background-color: #f9f9f9;
+  height: 35px;
+}
+.table-page {
+  padding: 8px;
+  color: #999;
+}
+.table-pagination {
+  margin: 0;
+  padding: 5px 5px 0 0;
+}
+.dropdown-column-selector {
+  padding: 8px 8px 5px 8px;
+}
+.table-filter {
+  margin-bottom: 0px;
+}
