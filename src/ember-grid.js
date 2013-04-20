@@ -27,7 +27,7 @@ GRID.QueryMixin = Ember.Mixin.create({
 GRID.PaginatedMixin = Ember.Mixin.create({
 
     page: 0,
-    limit: 25,
+    limit: 20,
 
     paginableContentBinding: 'content',
 
