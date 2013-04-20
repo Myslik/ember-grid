@@ -9,8 +9,13 @@
 
 App.IndexController = GRID.TableController.extend({
 
+    toolbar: [
+        GRID.ColumnSelector,
+        GRID.Filter
+    ],
+
     columns: [
-        GRID.column('name'),
+        GRID.column('name', { display: 'always' }),
         GRID.column('age')
     ]
 

@@ -1,22 +1,47 @@
 ﻿
 window.GRID = Ember.Namespace.create();
 
+GRID.QueryMixin = Ember.Mixin.create({
+    query: '',
+
+    queryProperties: [],
+
+    filterableContentBinding: 'content',
+
+    filteredContent: function () {
+        var query = this.get('query');
+        if (!query) return this;
+        var qProps = this.get('queryProperties');
+        return this.get('filterableContent').filter(function (row, index) {
+            var props = row.getProperties(qProps);
+            for (var prop in props) {
+                if (props[prop] && props[prop].toString().indexOf(query) >= 0) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }.property('query', 'queryProperties', 'filterableContent')
+});
+
 GRID.PaginatedMixin = Ember.Mixin.create({
 
     page: 0,
     limit: 25,
 
+    paginableContentBinding: 'content',
+
     offset: Ember.computed(function () {
         return this.get('page') * this.get('limit');
     }).property('page', 'limit'),
 
-    rows: Ember.computed(function () {
-        return this.slice(this.get('offset'), this.get('offset') + this.get('limit'));
-    }).property('@each', 'page', 'limit'),
+    paginatedContent: Ember.computed(function () {
+        return this.get('paginableContent').slice(this.get('offset'), this.get('offset') + this.get('limit'));
+    }).property('@each', 'page', 'limit', 'paginableContent'),
 
     pages: Ember.computed(function () {
-        return Math.ceil(this.get('length') / this.get('limit'));
-    }).property('length', 'limit'),
+        return Math.ceil(this.get('paginableContent.length') / this.get('limit'));
+    }).property('paginableContent.length', 'limit'),
 
     firstPage: function () {
         this.set('page', 0);
@@ -36,9 +61,24 @@ GRID.PaginatedMixin = Ember.Mixin.create({
 
 });
 
-GRID.TableController = Ember.ArrayProxy.extend(Ember.ControllerMixin, Ember.SortableMixin, GRID.PaginatedMixin, {
+GRID.TableController = Ember.ArrayProxy.extend(Ember.ControllerMixin, Ember.SortableMixin, GRID.QueryMixin, GRID.PaginatedMixin, {
 
     columns: [],
+
+    paginableContentBinding: 'filteredContent',
+
+    rowsBinding: 'paginatedContent',
+
+    queryProperties: function () {
+        if (!this.get('visibleColumns')) return [];
+        return this.get('visibleColumns').mapProperty('property');
+    }.property('visibleColumns'),
+
+    visibleColumns: function () {
+        return this.get('columns').filterProperty('visible', true);
+    }.property('columns.@each.visible'),
+
+    toolbar: [],
 
     sortBy: function (property) {
         var props = this.get('sortProperties');
@@ -66,6 +106,14 @@ GRID.Column = Ember.Object.extend({
         if (!this.get('property')) return '';
         return this.get('property').capitalize();
     }.property('property'),
+
+    display: true,
+    visible: function () {
+        return this.get('display') != false;
+    }.property('display'),
+    always: function () {
+        return this.get('display') === 'always';
+    }.property('display'),
 
     formatter: '{{view.content.%@}}',
     viewClass: function () {
@@ -106,7 +154,13 @@ GRID.column = function (property, options) {
 
 GRID.TableView = Ember.View.extend({
     classNames: ['ember-grid'],
-    defaultTemplate: Ember.Handlebars.compile('{{view GRID.InnerTableView}}{{view GRID.FooterView}}')
+    defaultTemplate: Ember.Handlebars.compile('{{view GRID.ToolbarView}}{{view GRID.InnerTableView}}{{view GRID.FooterView}}')
+});
+
+GRID.ToolbarView = Ember.ContainerView.extend({
+    classNames: ['table-toolbar'],
+    classNameBindings: ['childViews.length::hide'],
+    childViewsBinding: 'controller.toolbar'
 });
 
 GRID.InnerTableView = Ember.View.extend({
@@ -119,7 +173,7 @@ GRID.InnerTableView = Ember.View.extend({
 
 GRID.HeaderView = Ember.CollectionView.extend({
     tagName: 'tr',
-    contentBinding: 'controller.columns',
+    contentBinding: 'controller.visibleColumns',
     classNames: ['table-header'],
     itemViewClass: Ember.View.extend({
         tagName: 'th',
@@ -150,7 +204,7 @@ GRID.RowView = Ember.ContainerView.extend({
     tagName: 'tr',
     classNames: ['table-row'],
     rowBinding: 'content',
-    columnsBinding: 'controller.columns',
+    columnsBinding: 'controller.visibleColumns',
 
     columnsDidChange: function () {
         if (this.get('columns')) {
@@ -319,13 +373,32 @@ GRID.PaginationView = Ember.ContainerView.extend({
 
 GRID.PageView = Ember.View.extend({
     classNames: ['pull-left', 'table-page'],
-    defaultTemplate: Ember.Handlebars.compile('Showing {{view.first}} - {{view.last}} from {{length}}'),
+    defaultTemplate: Ember.Handlebars.compile('Showing {{view.first}} - {{view.last}} from {{filteredContent.length}}'),
 
     didPageChanged: function () {
         var page = this.get('controller.page');
         var limit = this.get('controller.limit');
-        var length = this.get('controller.length');
+        var length = this.get('controller.filteredContent.length');
         this.set('first', page * limit + 1);
         this.set('last', Math.min( length, page * limit + limit ));
-    }.observes('controller.page', 'controller.length')
+    }.observes('controller.page', 'controller.filteredContent.length')
+});
+
+// COMPONENTS
+
+GRID.ColumnSelector = Ember.View.extend({
+    classNames: ['btn-group'],
+    defaultTemplate: Ember.Handlebars.compile(
+        '<button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-th-list"></i> <span class="caret"></span></button>' +
+        '<ul class="dropdown-menu dropdown-column-selector">' +
+            '{{#each columns}}' +
+                '<li><label class="checkbox">{{view Ember.Checkbox checkedBinding="display" disabledBinding="always"}} {{header}}</label></li>' +
+            '{{/each}}' +
+        '</ul>')
+});
+
+GRID.Filter = Ember.View.extend({
+    tagName: 'form',
+    classNames: ['form-search', 'btn-group', 'table-filter'],
+    defaultTemplate: Ember.Handlebars.compile('{{view Ember.TextField class="search-query input-medium" placeholder="Type to filter" valueBinding="query"}}')
 });
