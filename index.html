@@ -46,8 +46,8 @@
 <div class="highlight"><pre><span class="nx">App</span><span class="p">.</span><span class="nx">PersonsController</span> <span class="o">=</span> <span class="nx">GRID</span><span class="p">.</span><span class="nx">TableController</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 
     <span class="nx">columns</span><span class="o">:</span> <span class="p">[</span>
-        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
-        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">header</span><span class="o">:</span> <span class="s1">'Full name'</span> <span class="p">}),</span>
+        <span class="nx">GRID</span><span class="p">.</span><span class="nx">column</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">formatter</span><span class="o">:</span> <span class="s1">'&lt;strong&gt;{{view.content.age}}&lt;/strong&gt;'</span> <span class="p">})</span>
     <span class="p">]</span>
 
 <span class="p">});</span>
