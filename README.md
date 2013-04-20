@@ -16,8 +16,8 @@ Grid component for Ember.js
 App.PersonsController = GRID.TableController.extend({
 
     columns: [
-        GRID.column('name'),
-        GRID.column('age')
+        GRID.column('name', { header: 'Full name' }),
+        GRID.column('age', { formatter: '<strong>{{view.content.age}}</strong>' })
     ]
 
 });
